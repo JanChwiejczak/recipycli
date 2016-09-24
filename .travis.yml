@@ -10,3 +10,5 @@ env:
   - TOXENV=py34
   - TOXENV=py27
   - TOXENV=flake8
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
