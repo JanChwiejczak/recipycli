@@ -4,20 +4,23 @@ from . import __version__ as VERSION
 
 
 class CliConfig(object):
-    """Passes cli configuration between commands."""
-    def __init__(self, debug):
-        self.debug = debug
+    """Passes configuration between commands."""
+    def __init__(self):
+        self.debug = False
 
-pass_config = click.make_pass_decorator(CliConfig)
+pass_config = click.make_pass_decorator(CliConfig, ensure=True)
 
 
 @click.group()
-@click.version_option(version=VERSION)  # TODO: perhaps hardcode version if this is the only place
+# TODO: perhaps hardcode version if this is the only place
+@click.version_option(version=VERSION)
 @click.option('--debug', is_flag=True,
               help='Show debug info while running command.')
-def main(debug):
-    """Frictionless provenance tracking in Python."""
-    pass
+@pass_config
+def main(config, debug):
+    """Frictionless provenance tracking in Python.
+    For more info type: recipy COMMAND --help"""
+    config.debug = debug
 
 
 @main.command()
@@ -29,8 +32,11 @@ def main(debug):
               help='Match all files from the same directory as FILENAME.')
 @click.option('--all', '-a', is_flag=True, help='Return all results.')
 @click.option('--json', '-j', is_flag=True, help='Return results as JSON.')
-@click.argument('filename', type=str, required=True)
-def search(fuzzy, id, filepath, all, json, filename):
+@click.argument('filename', type=click.Path(exists=True), required=True)
+@pass_config
+def search(config, fuzzy, id, filepath, all, json, filename):
     """Search for exact FILENAME in run outputs.
     By default it only returns the most recent result."""
+    if config.debug:
+        click.echo('Debug info...')
     click.echo('Searching...')
