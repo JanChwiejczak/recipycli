@@ -20,5 +20,3 @@ def test_search_with_only_filename(runner):
     assert result.exit_code == 0
     assert not result.exception
     assert result.output.strip() == 'Searching...'
-
-

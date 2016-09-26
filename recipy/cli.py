@@ -29,8 +29,7 @@ class CLI(click.MultiCommand):
         try:
             if sys.version_info[0] == 2:
                 cmd_name = cmd_name.encode('ascii', 'replace')
-            mod = __import__('recipy.cmd_' + cmd_name,
-                             None, None, ['cmd'])
+            mod = __import__('recipy.cmd_' + cmd_name, fromlist=['cmd'])
         except ImportError:
             return
         return mod.cmd
@@ -45,5 +44,3 @@ def main(config, debug):
     """Frictionless provenance tracking in Python.
     For more info type: recipy COMMAND --help"""
     config.debug = debug
-
-
