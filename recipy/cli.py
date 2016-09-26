@@ -1,6 +1,6 @@
+import os
+import sys
 import click
-
-from . import __version__ as VERSION
 
 
 class CliConfig(object):
@@ -9,11 +9,35 @@ class CliConfig(object):
         self.debug = False
 
 pass_config = click.make_pass_decorator(CliConfig, ensure=True)
+cmd_folder = os.path.dirname(__file__)
 
 
-@click.group()
-# TODO: perhaps hardcode version if this is the only place
-@click.version_option(version=VERSION)
+class CLI(click.MultiCommand):
+    """Implements MultiCommand click class methods to find other
+    commands in the cmd_folder. Command files must be in
+    format cmd_COMMANDNAME.py"""
+
+    def list_commands(self, ctx):
+        cmd = []
+        for filename in os.listdir(cmd_folder):
+            if filename.endswith('.py') and filename.startswith('cmd_'):
+                cmd.append(filename[4:-3])
+        cmd.sort()
+        return cmd
+
+    def get_command(self, ctx, cmd_name):
+        try:
+            if sys.version_info[0] == 2:
+                cmd_name = cmd_name.encode('ascii', 'replace')
+            mod = __import__('recipy.cmd_' + cmd_name,
+                             None, None, ['cmd'])
+        except ImportError:
+            return
+        return mod.cmd
+
+
+@click.command(cls=CLI)
+@click.version_option(version='0.1.0')
 @click.option('--debug', is_flag=True,
               help='Show debug info while running command.')
 @pass_config
@@ -23,20 +47,3 @@ def main(config, debug):
     config.debug = debug
 
 
-@main.command()
-@click.option('--fuzzy', '-f', is_flag=True,
-              help='Match based on a part of file name.')
-@click.option('--id', '-i', is_flag=True,
-              help='Match based on a fragment of run id.')
-@click.option('--filepath', '-p', is_flag=True,
-              help='Match all files from the same directory as FILENAME.')
-@click.option('--all', '-a', is_flag=True, help='Return all results.')
-@click.option('--json', '-j', is_flag=True, help='Return results as JSON.')
-@click.argument('filename', type=click.Path(exists=True), required=True)
-@pass_config
-def search(config, fuzzy, id, filepath, all, json, filename):
-    """Search for exact FILENAME in run outputs.
-    By default it only returns the most recent result."""
-    if config.debug:
-        click.echo('Debug info...')
-    click.echo('Searching...')
