@@ -44,3 +44,5 @@ def main(config, debug):
     """Frictionless provenance tracking in Python.
     For more info type: recipy COMMAND --help"""
     config.debug = debug
+    if config.debug:
+        click.echo('Debug info...')

@@ -8,7 +8,7 @@ def runner():
     return CliRunner()
 
 
-def test_search_with_only_filename(runner):
+def test_latest_returns_last_run(runner):
     result = runner.invoke(cmd_latest.cmd)
     assert result.exit_code == 0
     assert not result.exception

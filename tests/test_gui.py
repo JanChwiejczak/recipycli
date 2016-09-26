@@ -8,7 +8,7 @@ def runner():
     return CliRunner()
 
 
-def test_search_with_only_filename(runner):
+def test_gui_is_started(runner):
     result = runner.invoke(cmd_gui.cmd)
     assert result.exit_code == 0
     assert not result.exception

@@ -8,9 +8,9 @@ def runner():
     return CliRunner()
 
 
-def test_main_correctly_passes_debug(runner):
+def test_main_correctly_passes_config(runner):
     result = runner.invoke(cli.main,
-                           ['--debug', 'search', 'README.md'])
+                           ['--debug', 'latest'])
     assert not result.exception
     assert result.exit_code == 0
     assert 'Debug info...' in result.output
